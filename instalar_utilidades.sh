@@ -164,7 +164,6 @@ fi
 print_magenta "------------------------------------------"
 print_green "========== [Herramienta de descompresión automática] unp =========="
 print_magenta "------------------------------------------"
-instalar_apt unzip
 instalar_apt unp
 
 print_magenta "------------------------------------------"
