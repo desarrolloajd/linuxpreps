@@ -7,12 +7,15 @@ print_blue() { echo -e "\e[34m$1\e[0m"; }
 print_magenta() { echo -e "\e[35m$1\e[0m"; }
 
 instalar_apt() {
+  # Use set +e to allow the function to handle errors itself without triggering set -e exit
+  set +e
   sudo apt-get install -y "$@" > /dev/null 2>&1
   if [ $? -eq 0 ]; then
     print_blue "$* instalado correctamente."
   else
     print_yellow "Hubo un problema instalando $*."
   fi
+  set -e
 }
 
 print_magenta "------------------------------------------"
@@ -29,9 +32,17 @@ print_magenta "------------------------------------------"
 print_green "========== [Particiones y Espacio Ocupado] duf =========="
 print_magenta "------------------------------------------"
 if ! command -v duf > /dev/null; then
-  wget -q https://github.com/muesli/duf/releases/download/v0.8.1/duf_0.8.1_linux_amd64.deb -O /tmp/duf.deb
-  sudo dpkg -i /tmp/duf.deb > /dev/null 2>&1
-  rm /tmp/duf.deb
+  ARCH=$(uname -m)
+  if [ "$ARCH" = "x86_64" ]; then
+    ARCH="amd64"
+  elif [ "$ARCH" = "aarch64" ]; then
+    ARCH="arm64"
+  fi
+  wget -q https://github.com/muesli/duf/releases/download/v0.9.1/duf_0.9.1_linux_$ARCH.tar.gz -O /tmp/duf.tar.gz
+  tar -xzf /tmp/duf.tar.gz -C /tmp
+  sudo mv /tmp/duf_*_linux_$ARCH/duf /usr/local/bin/
+  sudo chmod +x /usr/local/bin/duf
+  rm -r /tmp/duf_*_linux_$ARCH /tmp/duf.tar.gz
   print_blue "duf instalado correctamente."
 else
   print_yellow "duf ya está instalado."
@@ -72,18 +83,24 @@ else
 fi
 
 print_magenta "------------------------------------------"
-print_green "========== [Sustituto del ls] exa =========="
+print_green "========== [Sustituto del ls] eza =========="
 print_magenta "------------------------------------------"
-if ! command -v exa > /dev/null; then
-  EXA_VER="0.10.1"
-  wget -q https://github.com/ogham/exa/releases/download/v${EXA_VER}/exa-linux-x86_64-v${EXA_VER}.zip -O /tmp/exa.zip
-  unzip -q /tmp/exa.zip -d /tmp/exa
-  sudo mv /tmp/exa/bin/exa /usr/local/bin/
-  sudo chmod +x /usr/local/bin/exa
-  rm -r /tmp/exa /tmp/exa.zip
-  print_blue "exa instalado correctamente."
+if ! command -v eza > /dev/null; then
+  EZA_VER="1.0.0"
+  ARCH=$(uname -m)
+  if [ "$ARCH" = "x86_64" ]; then
+    ARCH="x86_64"
+  elif [ "$ARCH" = "aarch64" ]; then
+    ARCH="aarch64"
+  fi
+  wget -q https://github.com/eza-community/eza/releases/download/v${EZA_VER}/eza-linux-${ARCH}-gnu.tar.xz -O /tmp/eza.tar.xz
+  tar -xJf /tmp/eza.tar.xz -C /tmp
+  sudo mv /tmp/eza-linux-${ARCH}-gnu/eza /usr/local/bin/
+  sudo chmod +x /usr/local/bin/eza
+  rm -r /tmp/eza-linux-${ARCH}-gnu /tmp/eza.tar.xz
+  print_blue "eza instalado correctamente."
 else
-  print_yellow "exa ya está instalado."
+  print_yellow "eza ya está instalado."
 fi
 
 print_magenta "------------------------------------------"

@@ -29,10 +29,9 @@ echo \
 sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
-print_green "Installing Docker Compose..."
-sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-docker-compose --version
+print_green "Installing Docker Compose Plugin (v2)..."
+sudo apt-get install -y docker-compose-plugin
+docker compose version
 '
 
 # Uncomment the following block to set up a new user
